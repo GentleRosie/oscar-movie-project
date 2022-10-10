@@ -1,3 +1,3 @@
-# CSC131
-# READ ME
+# CSC131 - Krabby Daddies
+
 This is group "Krabby Daddy" Movie database project for CSC 131
