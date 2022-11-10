@@ -13,9 +13,11 @@ mongo = PyMongo(app)
 PORT = 8080
 HOST = "127.0.0.1"
 
+
 @app.route('/')
 def hello_world():  # put application's code here
     return 'Hello World!'
+
 
 @app.get("/api/v1/movies")
 def get_movies():  # import string to get the string from the api
@@ -26,12 +28,14 @@ def get_movies():  # import string to get the string from the api
         return {"error": f"No data found for that movie"}, 404
     return data
 
+
 @app.get("/api/v1/movies/<int:year>")
 def get_academy_awards_nominees(year: int):
     package = Package('https://datahub.io/rufuspollock/oscars-nominees-and-winners/datapackage.json')
     for resource in package.resources:
         if resource.descriptor['datahub']['type'] == 'derived/csv':
             return resource.read()
+
 
 @app.post("/api/v1/movies")
 def add_movie():
