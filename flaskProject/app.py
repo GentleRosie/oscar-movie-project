@@ -17,6 +17,7 @@ from bson.objectid import ObjectId
 from flask import jsonify
 from flask_pymongo import PyMongo
 from movie import Movie
+from datapackage import Package
 
 app = Flask(__name__)
 # pip install Flask pymongo
@@ -64,6 +65,26 @@ def get_movies(movie_name: string):     #import string to get the string from th
     if len(data) == 2:
         return {"error": f"No data found for movie {movie_name}"}, 404
     return data
+
+
+@app.get("/api/v1/movies/<int:year>")
+def get_movies_by_year(year: int):
+    package = Package('https://datahub.io/rufuspollock/oscars-nominees-and-winners/datapackage.json')
+    movie_list = None
+    movie_return_list = []
+    for resource in package.resources:
+        if resource.descriptor['datahub']['type'] == 'derived/csv':
+            movie_list = resource.read()
+    for i in range(len(movie_list)):
+        if movie_list[i][0] == year:
+            movie_year = movie_list[i][0]
+            category = movie_list[i][1]
+            winner = movie_list[i][2]
+            entity = movie_list[i][3]
+            movie_return_list.append({"year": movie_year, "category": category, "winner": winner, "entity": entity})
+    if len(movie_return_list) == 0:
+        return {"error": f"No data found for year {year}"}, 404
+    return movie_return_list
 
 
 @app.post("/api/v1/movies")
