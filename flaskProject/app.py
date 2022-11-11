@@ -7,6 +7,7 @@ Tasks:
 5. Transition to CRUD
 6.
 """
+import pymongo
 #import pymongo
 #from pymongo import MongoClient
 
@@ -27,15 +28,21 @@ app = Flask(__name__)
 #db = client.flask_db
 #todos = db.todos
 
-app.config['MONGO_URI'] = "mongodb+srv://movielover99:movielover4life@movies.agbzkrd.mongodb.net/movie"
-
-mongo = PyMongo(app)
+#app.config['MONGO_URI'] = "mongodb+srv://movielover99:movielover4life@movies.agbzkrd.mongodb.net/movie"
+#app.config['MONGO_URI'] = "mongodb://localhost/"
+#mongo = PyMongo(app)
 
 
 PORT = 8080
 HOST = "127.0.0.1"
 
 movie_data = [{},{},{}]
+
+myclient = pymongo.MongoClient("mongodb://localhost/")
+mydb = myclient["Movies"]
+mycol = mydb["movie"]
+
+
 
 @app.route('/')
 def hello_world():  # put application's code here
@@ -53,7 +60,7 @@ def add_movie():
         if 'title' in response and 'year' in response and 'director' in response:
             #response["id"] = _find_next_id(user_data)
             #user_data.append(response)
-            id = mongo.db.movie.insert_one({'title':response['title'],'year':response['year'],'director':response['director']})
+            id = mycol.insert_one({'title':response['title'],'year':response['year'],'director':response['director']})
             return response, 201
         else:
             return {"error": "Malformed request. Missing required user fields"}, 400
