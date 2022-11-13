@@ -7,6 +7,8 @@ Tasks:
 5. Transition to CRUD
 6.
 """
+import string
+
 import pymongo
 #import pymongo
 #from pymongo import MongoClient
@@ -36,21 +38,27 @@ app = Flask(__name__)
 PORT = 8080
 HOST = "127.0.0.1"
 
-movie_data = [{},{},{}]
-
 myclient = pymongo.MongoClient("mongodb://localhost/")
 mydb = myclient["Movies"]
 mycol = mydb["movie"]
-
-
 
 @app.route('/')
 def hello_world():  # put application's code here
     return 'Hello World!'
 
 @app.get("/api/v1/movies")
-def get_movies():
-    return jsonify("FINISH THIS METHOD!")
+def get_all_movies():
+    result = []
+    for movie in mycol.find():
+        result.append({'title' : movie['title'], 'year' : movie['year'], 'director' : movie['director']})
+    return jsonify({'result' : result})
+
+@app.get("/api/v1/movies/<string:movie_title>")
+def get_one_movie(movie_title: string):
+    movie = mycol.find_one({'title' : movie_title})
+    result = []
+    result.append({'title' : movie['title'], 'year' : movie['year'], 'director' : movie['director']})
+    return jsonify({'result' : result})
 
 """ THE METHOD BELOW IS NOT READY"""
 @app.post("/api/v1/movies")
@@ -66,6 +74,24 @@ def add_movie():
             return {"error": "Malformed request. Missing required user fields"}, 400
     return {"error": "Request must be JSON"}, 415
 
+@app.put("/api/v1/movies/<string:movie_title>")
+def edit_movie_data(movie_title: string):
+    if request.is_json:
+        if 'title' in request.json or 'year' in request.json or 'director' in request.json:
+            myquery = {'title' : movie_title}
+            newvalues = { "$set": { "title": request.json.get('title'), "year": request.json.get('year'), "director": request.json.get('director') } }
+            mycol.update_one(myquery, newvalues)
+            return jsonify("done!"), 200
+        else:
+            return {"error": "Malformed request. Missing required user fields"}, 400
+    return {"error": "Request must be JSON"}, 415
+
+@app.delete("/api/v1/movies/<string:movie_title>")
+def delete_user(movie_title: string):
+    myquery = {"title": movie_title}
+    movie = mycol.find_one(myquery)
+    mycol.delete_one(myquery)
+    return jsonify({'title' : movie['title'], 'year' : movie['year'], 'director' : movie['director']}), 200
 # @app.route('/', methods=('GET', 'POST'))
 # def index():
 #     return render_template('index.html')
