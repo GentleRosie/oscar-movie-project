@@ -1,18 +1,20 @@
+from math import floor
 from flask import Flask
 from flask import request
 from MovieAPI import MovieAPI
 from json import load
 from flask import jsonify
-from flask_pymongo import PyMongo
+# from flask_pymongo import PyMongo
 # import string
 
 app = Flask(__name__)
 
-app.config['MONGO_URI'] = 'mongodb://localhost:27017/MovieProject'
-mongo_client = PyMongo(app)
-mongo_collection = mongo_client.db['movies']
-db = mongo_collection
-ID = 0
+# app.config['MONGO_URI'] = 'mongodb://localhost:27017/MovieProject'
+# mongo_client = PyMongo(app)
+# mongo_collection = mongo_client.db['movies']
+# db = mongo_collection
+# ID = 0
+
 
 @app.route('/add', methods = ['POST'])
 def add_user():
@@ -97,14 +99,14 @@ def get_oscar_best_picture_winners_by_year(year: int):
                                                        'OUTSTANDING MOTION PICTURE','BEST MOTION PICTURE',
                                                        'BEST PICTURE'])
     academy_awards_file.close()
-    global ID
-    api = MovieAPI('https://www.omdbapi.com/?apikey=', '8066aa78')
-    movie = winners_list[0]['film']
-    year = winners_list[0]['year']
-    data = api.search_movie_title_and_year(movie, year)
-    print(data)
-    db.movies.insert_one({'id': ID, 'data': data})
-    ID = ID + 1
+    # global ID
+    # api = MovieAPI('https://www.omdbapi.com/?apikey=', '8066aa78')
+    # movie = winners_list[0]['film']
+    # year = winners_list[0]['year']
+    # data = api.search_movie_title_and_year(movie, year)
+    # print(data)
+    # db.movies.insert_one({'id': ID, 'data': data})
+    # ID = ID + 1
     return winners_list
 
 
@@ -119,6 +121,19 @@ def get_oscar_best_actor_winners_by_year(year: int):
                                                        'ACTRESS IN A LEADING ROLE','ACTRESS'])
     academy_awards_file.close()
     return winners_list
+
+
+@app.get("/api/v1/movies/recommendation")
+def get_movie_recommendation():
+    year_frequency = [0] * 10
+    index = None
+    test_data = [1969, 2019, 1981, 1974, 2016, 1989, 1946]
+    for year in test_data:
+        if test_data < 2000:
+            index = floor((year % 100) / 10) * 10
+        else:
+            index = 9 + floor((year % 100) / 10) * 10
+    # query database based on highest years searched then return movie
 
 
 # @app.get("/api/v2/movies")
