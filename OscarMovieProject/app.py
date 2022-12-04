@@ -1,19 +1,36 @@
 from math import floor
-from flask import Flask
+from flask import Flask, render_template
 from flask import request
 from MovieAPI import MovieAPI
 from json import load
 from flask import jsonify
-# from flask_pymongo import PyMongo
-# import string
+from flask_pymongo import PyMongo
+import subprocess as sp
+import string
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='client/public')
 
-# app.config['MONGO_URI'] = 'mongodb://localhost:27017/MovieProject'
-# mongo_client = PyMongo(app)
-# mongo_collection = mongo_client.db['movies']
-# db = mongo_collection
-# ID = 0
+app.config['MONGO_URI'] = 'mongodb://localhost:27017/Movies'
+mongo_client = PyMongo(app)
+mongo_collection = mongo_client.db['movie']
+db = mongo_collection
+ID = 0
+
+
+@app.route('/', methods=('GET', 'POST'))
+def index():
+    list = db.find()
+    return render_template('index.html', list=list)
+
+
+
+
+# @app.get("/api/v2/movies")
+# def get_all_movies():
+#     result = []
+#     for movie in db.find():
+#         result.append({'title' : movie['title'], 'year' : movie['year'], 'director' : movie['director']})
+#     return jsonify({'result' : result})
 
 
 @app.route('/add', methods = ['POST'])
@@ -136,55 +153,55 @@ def get_movie_recommendation():
     # query database based on highest years searched then return movie
 
 
-# @app.get("/api/v2/movies")
-# def get_all_movies():
-#     result = []
-#     for movie in db.find():
-#         result.append({'title' : movie['title'], 'year' : movie['year'], 'director' : movie['director']})
-#     return jsonify({'result' : result})
-#
-#
-# @app.get("/api/v2/movies/<string:movie_title>")
-# def get_one_movie(movie_title: string):
-#     movie = db.find_one({'title' : movie_title})
-#     result = []
-#     result.append({'title' : movie['title'], 'year' : movie['year'], 'director' : movie['director']})
-#     return jsonify({'result' : result})
-#
-#
-# @app.post("/api/v2/movies/")
-# def add_movie():
-#     if request.is_json:
-#         response = request.get_json()
-#         if 'title' in response and 'year' in response and 'director' in response:
-#             #response["id"] = _find_next_id(user_data)
-#             #user_data.append(response)
-#             id = db.insert_one({'title':response['title'],'year':response['year'],'director':response['director']})
-#             return response, 201
-#         else:
-#             return {"error": "Malformed request. Missing required user fields"}, 400
-#     return {"error": "Request must be JSON"}, 415
-#
-#
-# @app.put("/api/v2/movies/<string:movie_title>")
-# def edit_movie_data(movie_title: string):
-#     if request.is_json:
-#         if 'title' in request.json or 'year' in request.json or 'director' in request.json:
-#             myquery = {'title' : movie_title}
-#             newvalues = { "$set": { "title": request.json.get('title'), "year": request.json.get('year'), "director": request.json.get('director') } }
-#             db.update_one(myquery, newvalues)
-#             return jsonify("done!"), 200
-#         else:
-#             return {"error": "Malformed request. Missing required user fields"}, 400
-#     return {"error": "Request must be JSON"}, 415
-#
-#
-# @app.delete("/api/v2/movies/<string:movie_title>")
-# def delete_user(movie_title: string):
-#     myquery = {"title": movie_title}
-#     movie = db.find_one(myquery)
-#     db.delete_one(myquery)
-#     return jsonify({'title' : movie['title'], 'year' : movie['year'], 'director' : movie['director']}), 200
+@app.get("/api/v2/movies")
+def get_all_movies():
+    result = []
+    for movie in db.find():
+        result.append({'title' : movie['title'], 'year' : movie['year'], 'director' : movie['director']})
+    return jsonify({'result' : result})
+
+
+@app.get("/api/v2/movies/<string:movie_title>")
+def get_one_movie(movie_title: string):
+    movie = db.find_one({'title' : movie_title})
+    result = []
+    result.append({'title' : movie['title'], 'year' : movie['year'], 'director' : movie['director']})
+    return jsonify({'result' : result})
+
+
+@app.post("/api/v2/movies/")
+def add_movie():
+    if request.is_json:
+        response = request.get_json()
+        if 'title' in response and 'year' in response and 'director' in response:
+            #response["id"] = _find_next_id(user_data)
+            #user_data.append(response)
+            id = db.insert_one({'title':response['title'],'year':response['year'],'director':response['director']})
+            return response, 201
+        else:
+            return {"error": "Malformed request. Missing required user fields"}, 400
+    return {"error": "Request must be JSON"}, 415
+
+
+@app.put("/api/v2/movies/<string:movie_title>")
+def edit_movie_data(movie_title: string):
+    if request.is_json:
+        if 'title' in request.json or 'year' in request.json or 'director' in request.json:
+            myquery = {'title' : movie_title}
+            newvalues = { "$set": { "title": request.json.get('title'), "year": request.json.get('year'), "director": request.json.get('director') } }
+            db.update_one(myquery, newvalues)
+            return jsonify("done!"), 200
+        else:
+            return {"error": "Malformed request. Missing required user fields"}, 400
+    return {"error": "Request must be JSON"}, 415
+
+
+@app.delete("/api/v2/movies/<string:movie_title>")
+def delete_user(movie_title: string):
+    myquery = {"title": movie_title}
+    movie = db.find_one(myquery)
+    db.delete_one(myquery)
+    return jsonify({'title' : movie['title'], 'year' : movie['year'], 'director' : movie['director']}), 200
 
 
 if __name__ == '__main__':
