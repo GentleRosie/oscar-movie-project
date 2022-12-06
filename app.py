@@ -1,31 +1,12 @@
-# from math import floor
-import json
-
 from flask import Flask  # , render_template
 from flask import request
-from MovieAPI import MovieAPI
-from json import load
 # from flask import jsonify
-from flask_pymongo import PyMongo
-from bson.objectid import ObjectId
 # import subprocess as sp
+from pre_initializer import movie_api, academy_awards_data
+from initializer import app, mongo
 
-
-class MyEncoder(json.JSONEncoder):
-
-    def default(self, o):
-        if isinstance(o, ObjectId):
-            return str(o)
-        return super(MyEncoder, self).default(o)
-
-
-app = Flask(__name__)   # , template_folder='client/public') look into what template_folder does
-app.config['MONGO_URI'] = 'mongodb://localhost:27017/MovieProject'
-app.json_encoder = MyEncoder
-mongo = PyMongo(app)
-academy_awards_file = open('new_data_json.json', encoding='utf-8')
-academy_awards_data = load(academy_awards_file)
-movie_api = MovieAPI('https://www.omdbapi.com/?apikey=', '902f9339')
+from utility import dictionary_builder, get_winners_and_nominees_of_year_dict, \
+    get_category_of_winners_by_year, get_omdb_list_of_movies_by_title_and_year
 
 
 # @app.route('/', methods=('GET', 'POST'))
@@ -69,68 +50,63 @@ movie_api = MovieAPI('https://www.omdbapi.com/?apikey=', '902f9339')
 #     return {"names": ["Alan", "Edgar", "Poe"]}
 
 
-@app.get("/api/v1/omdb/movies")
-def get_movie_data():
+@app.get('/api/v1/omdb/movies')
+def get_omdb_movie_data():
     movie_title = request.args['title']
     movie_data = movie_api.search_movie_title(movie_title)
+
     if len(movie_data) == 2:
-        return {"error": f"No data found for movie {movie_title}"}, 404
-    return {'director': movie_data['Director'], 'language': movie_data['Language'],
-            'title': movie_data['Title'], 'year': movie_data['Year']}
+        return dictionary_builder(['error'], [f'No data found for movie {movie_title}']), 404
+
+    response = dictionary_builder(['director', 'language', 'title', 'year'],
+                                  [movie_data['Director'], movie_data['Language'],
+                                   movie_data['Title'], movie_data['Year']])
+    mongo.db.omdb.insert_one(response)
+    response.pop('_id')
+    return response, 200
 
 
-@app.get("/api/v1/oscars/movies/<int:year>")
+@app.get('/api/v1/oscars/<int:year>')
 def get_oscar_nominees_by_year(year: int):
     if year < 1927 or year > 2019:
-        return {"error": f"No data found for year {year}"}, 404
+        return dictionary_builder(['error'], [f'No data found for year {year}']), 404
 
-    winners_list = []
-    nominees_list = []
-
-    for award in academy_awards_data:
-        if award['year'] == year:
-            if award['winner']:
-                winners_list.append(award)
-            else:
-                nominees_list.append(award)
-
-    return {"winners": winners_list, "nominees": nominees_list}
+    response = get_winners_and_nominees_of_year_dict(academy_awards_data, year)
+    response['year'] = year
+    mongo.db.oscars.insert_one(response)
+    response.pop('_id')
+    return response, 200
 
 
-def _helper(category: str, year: int, categories: list) -> dict:
-    winners_list = []
-    for award in academy_awards_data:
-        if award['year'] == year and award['winner']:
-            for category in categories:
-                if award['category'] == category:
-                    winners_list.append(award)
-                    break
-    winner_movie_title = winners_list[0]['film']
-    winner_movie_year = winners_list[0]['year']
-    print(f'{winner_movie_title}, {winner_movie_year}')
-    movie_data = movie_api.search_movie_title_and_year(winner_movie_title, winner_movie_year)
-    mongo.db.movies.insert_one({f'{category} of year {year}': movie_data})
-    return {f'{category} of year {year}': movie_data}
-
-
-@app.get("/api/v1/oscars/movies/best_picture/<int:year>")
+@app.get('/api/v1/oscars/best_picture/<int:year>')
 def get_oscar_best_picture_winners_by_year(year: int):
     if year < 1927 or year > 2019:
-        return {"error": f"No data found for year {year}"}, 404
+        return dictionary_builder(['error'], [f'No data found for year {year}']), 404
 
-    return _helper('Best Picture', year, ['OUTSTANDING PICTURE', 'OUTSTANDING PRODUCTION',
-                                          'OUTSTANDING MOTION PICTURE', 'BEST MOTION PICTURE', 'BEST PICTURE'])
+    response = get_category_of_winners_by_year(academy_awards_data, year, 'Best Picture',
+                                               ['OUTSTANDING PICTURE', 'OUTSTANDING PRODUCTION',
+                                                'OUTSTANDING MOTION PICTURE', 'BEST MOTION PICTURE', 'BEST PICTURE'])
+    response['omdb'] = response['omdb'] = get_omdb_list_of_movies_by_title_and_year(response['winners'])
+    mongo.db.oscars.insert_one(response)
+    response.pop('_id')
+    return response, 200
 
 
-@app.get("/api/v1/oscars/movies/best_actor/<int:year>")
+@app.get('/api/v1/oscars/best_actor/<int:year>')
 def get_oscar_best_actor_winners_by_year(year: int):
     if year < 1927 or year > 2019:
-        return {"error": f"No data found for year {year}"}, 404
+        return dictionary_builder(['error'], [f'No data found for year {year}']), 404
 
-    return _helper('Best Actor', year, ['ACTOR', 'ACTOR IN A LEADING ROLE', 'ACTRESS IN A LEADING ROLE', 'ACTRESS'])
+    response = get_category_of_winners_by_year(academy_awards_data, year, 'Best Actors',
+                                               ['ACTOR', 'ACTOR IN A LEADING ROLE',
+                                                'ACTRESS IN A LEADING ROLE', 'ACTRESS'])
+    response['omdb'] = get_omdb_list_of_movies_by_title_and_year(response['winners'])
+    mongo.db.oscars.insert_one(response)
+    response.pop('_id')
+    return response, 200
 
 
-# @app.get("/api/v1/oscars/movies/recommendation") WORKING ON IMPLEMENTATION
+# @app.get('/api/v1/oscars/recommendation') WORKING ON IMPLEMENTATION
 # def get_movie_recommendation():
 #     year_frequency = [0] * 10
 #     index = None
@@ -143,72 +119,88 @@ def get_oscar_best_actor_winners_by_year(year: int):
 #     # query database based on highest years searched then return movie
 
 
-@app.get("/api/v1/user/movies")
+@app.get('/api/v1/user/movies')
 def get_all_movies():
     response = []
-    for movie_data in mongo.db.movies.find():
-        response.append({'director': movie_data['director'], 'language': movie_data['language'],
-                         'title': movie_data['title'], 'year': movie_data['year']})
-    return {'Movies': response}
+    for movie_data in mongo.db.user.find():
+        movie_data.pop('_id')
+        response.append(movie_data)
+    return dictionary_builder(['movies'], [response])
 
 
-@app.get("/api/v1/user/movies/<string:movie_title>")
+@app.get('/api/v1/user/movies/<string:movie_title>')
 def get_one_movie(movie_title: str):
-    movie_data = mongo.db.movies.find_one({'title': movie_title})
-    response = {'director': movie_data['director'], 'language': movie_data['language'],
-                'title': movie_data['title'], 'year': movie_data['year']}
-    return {'Movie': response}
+    movie_data = mongo.db.user.find_one(dictionary_builder(['title'], [movie_title]))
+
+    if movie_data is None:
+        return {'error': f'No data found for movie {movie_title}'}, 404
+
+    movie_data.pop('_id')
+    return movie_data
 
 
-@app.post("/api/v1/user/movies")
+@app.post('/api/v1/user/movies')
 def add_one_movie():
     if not request.is_json:
-        return {'Error': 'Request must be JSON'}, 415
+        return {'error': 'Request must be JSON'}, 415
 
     if not ('director' in request.json and 'language' in request.json and
             'title' in request.json and 'year' in request.json):
-        return {'Error': 'Malformed request. Missing required movie fields'}, 400
+        return {'error': 'Malformed request. Missing required movie fields'}, 400
 
-    response = {'director': request.json.get('director'), 'language': request.json.get('language'),
-                'title': request.json.get('title'), 'year': request.json.get('year')}
-    mongo.db.movies.insert_one(response)
+    response = dictionary_builder(['director', 'language', 'title', 'year'],
+                                  [request.json.get('director'), request.json.get('language'),
+                                   request.json.get('title'), request.json.get('year')])
+    mongo.db.user.insert_one(response)
+    response.pop('_id')
     return response, 201
 
 
-@app.put("/api/v1/user/movies/<string:movie_title>")
+@app.put('/api/v1/user/movies/<string:movie_title>')
 def edit_one_movie(movie_title: str):
-    movie_format = {'title': movie_title}
-    movie_data = mongo.db.movies.find_one(movie_format)
+    movie_format = dictionary_builder(['title'], [movie_title])
+    movie_data = mongo.db.user.find_one(movie_format)
 
     if movie_data is None:
-        return {'Error': f'No data found for movie {movie_title}'}, 404
+        return {'error': f'No data found for movie {movie_title}'}, 404
 
     if not request.is_json:
-        return {'Error': 'Request must be JSON'}, 415
+        return {'error': 'Request must be JSON'}, 415
 
     if not ('director' in request.json or 'language' in request.json or
             'title' in request.json or 'year' in request.json):
-        return {'Error': 'Malformed request. Missing required movie fields'}, 400
+        return {'error': 'Malformed request. Missing required movie fields'}, 400
 
-    response = {'title': request.json.get('title') or movie_data['title'],
-                'director': request.json.get('director') or movie_data['director'],
-                'language': request.json.get('language') or movie_data['language'],
-                'year': request.json.get('year') or movie_data['year']}
-    mongo.db.movies.update_one(movie_format, {'$set': response})
-    return response, 200
+    field_keys = []
+    field_values = []
+
+    for field in ['director', 'language', 'title', 'year']:
+        if field in request.json:
+            field_keys.append(field)
+            field_values.append(request.json.get(field))
+
+    response = dictionary_builder(field_keys, field_values)
+    mongo.db.user.update_one(movie_format, {'$set': response})
+
+    if 'title' in request.json:
+        movie_format = dictionary_builder(['title'], [request.json.get('title')])
+
+    movie_data = mongo.db.user.find_one(movie_format)
+    movie_data.pop('_id')
+    return movie_data, 200
 
 
-@app.delete("/api/v1/user/movies/<string:movie_title>")
+@app.delete('/api/v1/user/movies/<string:movie_title>')
 def delete_one_movie(movie_title: str):
-    movie_format = {"title": movie_title}
-    movie_data = mongo.db.movies.find_one(movie_format)
+    movie_format = dictionary_builder(['title'], [movie_title])
+    movie_data = mongo.db.user.find_one(movie_format)
 
     if movie_data is None:
-        return {'Error': f'No data found for movie {movie_title}'}, 404
+        return {'error': f'No data found for movie {movie_title}'}, 404
 
-    mongo.db.movies.delete_one(movie_format)
-    return {'director': movie_data['director'], 'language': movie_data['language'],
-            'title': movie_data['title'], 'year': movie_data['year']}, 200
+    mongo.db.user.delete_one(movie_format)
+    movie_data.pop('_id')
+    return movie_data, 200
 
 
 if __name__ == '__main__':
