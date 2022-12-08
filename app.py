@@ -8,7 +8,9 @@ from initializer import app, mongo
 from utility import dictionary_builder, get_winners_and_nominees_of_year_dict, \
     get_category_of_winners_by_year, get_omdb_list_of_movies_by_title_and_year
 
-
+genre_list = []
+ratings_list = []
+rated_list = []
 # @app.route('/', methods=('GET', 'POST'))
 # def index():
 #     movie_list = mongo.db.movies.find()
@@ -58,12 +60,30 @@ def get_omdb_movie_data():
     if len(movie_data) == 2:
         return dictionary_builder(['error'], [f'No data found for movie {movie_title}']), 404
 
+    recommendation_lists(movie_data)
+
     response = dictionary_builder(['director', 'language', 'title', 'year'],
                                   [movie_data['Director'], movie_data['Language'],
                                    movie_data['Title'], movie_data['Year']])
     mongo.db.omdb.insert_one(response)
     response.pop('_id')
     return response, 200
+
+
+# Add stuff for genre_list (string tokenizer to separate the genres) and ratings_list
+def recommendation_lists(movie_data: dict):
+    rated = movie_data['Rated']
+    if len(rated_list) == 0:
+        rated_list.insert(0, [rated, 1])
+    else:
+        for i in range(len(rated_list)):
+            if rated_list[i][0] == rated:
+                rated_list[i][1] += 1
+                break
+            if i == len(rated_list) - 1:
+                rated_list.insert(0, [rated, 1])
+
+    print(rated_list)
 
 
 @app.get('/api/v1/oscars/<int:year>')
