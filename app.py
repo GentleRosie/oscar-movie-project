@@ -88,7 +88,7 @@ def recommendation_lists(movie_data: dict):
 
 @app.get('/api/v1/oscars/<int:year>')
 def get_oscar_nominees_by_year(year: int):
-    if year not in range(1927, 2020):
+    if year < 1927 or year > 2019:
         return dictionary_builder(['error'], [f'No data found for year {year}']), 404
 
     response = get_winners_and_nominees_of_year_dict(academy_awards_data, year)
@@ -100,7 +100,7 @@ def get_oscar_nominees_by_year(year: int):
 
 @app.get('/api/v1/oscars/best_picture/<int:year>')
 def get_oscar_best_picture_winners_by_year(year: int):
-    if year not in range(1927, 2020):
+    if year < 1927 or year > 2019:
         return dictionary_builder(['error'], [f'No data found for year {year}']), 404
 
     response = get_category_of_winners_by_year(academy_awards_data, year, 'Best Picture',
@@ -114,7 +114,7 @@ def get_oscar_best_picture_winners_by_year(year: int):
 
 @app.get('/api/v1/oscars/best_actor/<int:year>')
 def get_oscar_best_actor_winners_by_year(year: int):
-    if year not in range(1927, 2020):
+    if year < 1927 or year > 2019:
         return dictionary_builder(['error'], [f'No data found for year {year}']), 404
 
     response = get_category_of_winners_by_year(academy_awards_data, year, 'Best Actors',
