@@ -4,6 +4,7 @@ from flask import request
 # import subprocess as sp
 from pre_initializer import movie_api, academy_awards_data
 from initializer import app, mongo
+from flask import render_template
 
 from utility import dictionary_builder, get_winners_and_nominees_of_year_dict, \
     get_category_of_winners_by_year, get_omdb_list_of_movies_by_title_and_year
@@ -48,6 +49,16 @@ from utility import dictionary_builder, get_winners_and_nominees_of_year_dict, \
 # @app.route('/names', methods = ['GET'])
 # def default():
 #     return {"names": ["Alan", "Edgar", "Poe"]}
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    movie_list = []
+
+    for movies in mongo.db.omdb.find():
+        movies.pop('_id')
+        movie_list.append(movies)
+
+    return render_template('index.html', list=movie_list)
 
 
 @app.get('/api/v1/omdb/movies')
@@ -158,7 +169,7 @@ def add_one_movie():
 
 @app.put('/api/v1/user/movies/<string:movie_title>')
 def edit_one_movie(movie_title: str):
-    movie_format = dictionary_builder(['title'], [movie_title])
+    movie_format = dictionary_builder(['title'], [movie_title]) # {'title': movie_title}
     movie_data = mongo.db.user.find_one(movie_format)
 
     if movie_data is None:
@@ -171,23 +182,13 @@ def edit_one_movie(movie_title: str):
             'title' in request.json or 'year' in request.json):
         return {'error': 'Malformed request. Missing required movie fields'}, 400
 
-    field_keys = []
-    field_values = []
-
-    for field in ['director', 'language', 'title', 'year']:
-        if field in request.json:
-            field_keys.append(field)
-            field_values.append(request.json.get(field))
-
-    response = dictionary_builder(field_keys, field_values)
+    response = dictionary_builder(['director', 'language', 'title', 'year'],
+                                 [request.json.get('director') or movie_data['director'],
+                                  request.json.get('language') or movie_data['language'],
+                                  request.json.get('title') or movie_data['title'],
+                                  request.json.get('year') or movie_data['year']])
     mongo.db.user.update_one(movie_format, {'$set': response})
-
-    if 'title' in request.json:
-        movie_format = dictionary_builder(['title'], [request.json.get('title')])
-
-    movie_data = mongo.db.user.find_one(movie_format)
-    movie_data.pop('_id')
-    return movie_data, 200
+    return response, 200
 
 
 @app.delete('/api/v1/user/movies/<string:movie_title>')
