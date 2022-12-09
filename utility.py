@@ -89,34 +89,16 @@ def rated_recommendation_list(movie_data: dict):
 
 
 def ratings_recommendation_list(movie_data: dict):
+    # might ignore average of ratings and comparing to movies.  Instead, narrow down omdb api and have the final check
+    # be checking for the highest imdb rating
     ratings_list = app.ratings_list
-    ratings = movie_data['Ratings']
-    rotten_tomatoes = None
-    imdb = None
-    metacritic = None
-    for i in range(len(ratings)):
-        if ratings[i]['Source'] == "Rotten Tomatoes":
-            rotten_tomatoes = ratings[i]['Value']
-            rotten_tomatoes = int(rotten_tomatoes[0: -1])
-        if ratings[i]['Source'] == "Internet Movie Database":
-            imdb = ratings[i]['Value']
-            temp = imdb.split('/')
-            imdb = int(float(temp[0]) * 10)
-        if ratings[i]['Source'] == "Metacritic":
-            metacritic = ratings[i]['Value']
-            temp = metacritic.split('/')
-            metacritic = int(temp[0])
-    print(ratings)
-    print("ratings:", rotten_tomatoes, metacritic, imdb)
-
-    temp_list = [rotten_tomatoes, metacritic, imdb]
-    average = 0
-    counter = 0
-    for i in range(len(temp_list)):
-        if temp_list[i]:
-            counter += 1
-            average += temp_list[i]
-    average = average / counter
+    imdb = int(float(movie_data['imdbRating']) * 10)
+    print(imdb)
+    ratings_list.insert(0, imdb)
+    rating_sum = 0
+    for i in range(len(ratings_list)):
+        rating_sum += ratings_list[i]
+    average = rating_sum / len(ratings_list)
     print("rating average:", int(round(average, 0)))
 
 
