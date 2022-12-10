@@ -1,4 +1,4 @@
-from flask import Flask  # , render_template
+from flask import Flask, jsonify  # , render_template
 from flask import request
 # from flask import jsonify
 # import subprocess as sp
@@ -49,7 +49,7 @@ from utility import dictionary_builder, get_winners_and_nominees_of_year_dict, \
 # @app.route('/names', methods = ['GET'])
 # def default():
 #     return {"names": ["Alan", "Edgar", "Poe"]}
-
+FLASK_DEBUG = 1
 @app.route('/', methods=['GET', 'POST'])
 def index():
     movie_list = []
@@ -58,7 +58,7 @@ def index():
         movies.pop('_id')
         movie_list.append(movies)
 
-    return render_template('index.html', list=movie_list)
+    return render_template('table.html', list=movie_list)
 
 
 @app.get('/api/v1/omdb/movies')
