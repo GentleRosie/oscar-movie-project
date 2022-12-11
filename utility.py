@@ -72,6 +72,8 @@ def get_omdb_list_of_movies_by_title_and_year(movie_data: list) -> list:
     return omdb_list
 
 
+# for best_actor / best_picture results, function receives response['omdb'].  Loop through response['omdb'] to find if
+# there are multiple movies in response['omdb'] so that all data is retrieved.
 def rated_recommendation_list(movie_data: dict):
     rated_list = app.rated_list
     rated = movie_data['Rated']
@@ -88,6 +90,10 @@ def rated_recommendation_list(movie_data: dict):
     print(rated_list)
 
 
+# for best_actor / best_picture results, function receives response['omdb'].  Loop through response['omdb'] to find if
+# there are multiple movies in response['omdb'] so that all data is retrieved.
+
+# save the highest and lowest ratings and create something similar to a box plot???
 def ratings_recommendation_list(movie_data: dict):
     # might ignore average of ratings and comparing to movies.  Instead, narrow down omdb api and have the final check
     # be checking for the highest imdb rating
@@ -102,6 +108,8 @@ def ratings_recommendation_list(movie_data: dict):
     print("rating average:", int(round(average, 0)))
 
 
+# for best_actor / best_picture results, function receives response['omdb'].  Loop through response['omdb'] to find if
+# there are multiple movies in response['omdb'] so that all data is retrieved.
 def genre_recommendation_list(movie_data: dict):
     genre_list = app.genre_list
     genres = movie_data['Genre'].split(',')

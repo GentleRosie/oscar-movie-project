@@ -55,6 +55,8 @@ rated_list = []
 # def default():
 #     return {"names": ["Alan", "Edgar", "Poe"]}
 FLASK_DEBUG = 1
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     movie_list = []
@@ -66,6 +68,7 @@ def index():
     return render_template('table.html', list=movie_list)
 
 
+# incorporate into recommendation functions
 @app.get('/api/v1/omdb/movies')
 def get_omdb_movie_data():
     movie_title = request.args['title']
@@ -98,6 +101,7 @@ def get_oscar_nominees_by_year(year: int):
     return response, 200
 
 
+# incorporate into recommendation functions
 @app.get('/api/v1/oscars/best_picture/<int:year>')
 def get_oscar_best_picture_winners_by_year(year: int):
     if year < 1927 or year > 2019:
@@ -112,6 +116,7 @@ def get_oscar_best_picture_winners_by_year(year: int):
     return response, 200
 
 
+# incorporate into recommendation functions
 @app.get('/api/v1/oscars/best_actor/<int:year>')
 def get_oscar_best_actor_winners_by_year(year: int):
     if year < 1927 or year > 2019:
@@ -148,6 +153,7 @@ def get_all_movies():
     return dictionary_builder(['movies'], [response])
 
 
+# incorporate into recommendation functions
 @app.get('/api/v1/user/movies/<string:movie_title>')
 def get_one_movie(movie_title: str):
     movie_data = mongo.db.user.find_one(dictionary_builder(['title'], [movie_title]))
