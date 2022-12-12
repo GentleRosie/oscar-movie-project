@@ -1,64 +1,8 @@
-from flask import Flask  # , render_template
 from flask import request
-# from flask import jsonify
-# import subprocess as sp
 from pre_initializer import movie_api, academy_awards_data
 from initializer import app, mongo
-from flask import render_template
-
 from utility import dictionary_builder, get_winners_and_nominees_of_year_dict, \
     get_category_of_winners_by_year, get_omdb_list_of_movies_by_title_and_year
-
-
-# @app.route('/', methods=('GET', 'POST'))
-# def index():
-#     movie_list = mongo.db.movies.find()
-#     return render_template('index.html', list=movie_list)
-
-
-# @app.get("/api/v2/movies")
-# def get_all_movies():
-#     result = []
-#     for movie in db.find():
-#         result.append({'title' : movie['title'], 'year' : movie['year'], 'director' : movie['director']})
-#     return jsonify({'result' : result})
-# method was used in conjunction with React JS
-# @app.route('/add', methods = ['POST'])
-# def add_user():
-#     _json = request.json
-#     _name = _json['name']
-#     _email = _json['email']
-#     _password = _json['password']
-#
-#     if _name and _email and _password and request.method == 'POST':
-#         mongo.db.movies.insert_one({'name': _name, 'email': _email, 'password': _password})
-#         response = jsonify('User added successfully!')
-#         response.status_code = 200
-#         return response
-#     else:
-#         return not_found()
-# @app.errorhandler(404)
-# def not_found(error=None):
-#     message = {
-#         'status': 404,
-#         'message': 'Not Found' + request.url
-#     }
-#     response = jsonify(message)
-#
-#
-# @app.route('/names', methods = ['GET'])
-# def default():
-#     return {"names": ["Alan", "Edgar", "Poe"]}
-
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    movie_list = []
-
-    for movies in mongo.db.omdb.find():
-        movies.pop('_id')
-        movie_list.append(movies)
-
-    return render_template('index.html', list=movie_list)
 
 
 @app.get('/api/v1/omdb/movies')
@@ -136,7 +80,7 @@ def get_all_movies():
     for movie_data in mongo.db.user.find():
         movie_data.pop('_id')
         response.append(movie_data)
-    return dictionary_builder(['movies'], [response])
+    return dictionary_builder(['movies'], [response]), 200
 
 
 @app.get('/api/v1/user/movies/<string:movie_title>')
@@ -147,7 +91,7 @@ def get_one_movie(movie_title: str):
         return {'error': f'No data found for movie {movie_title}'}, 404
 
     movie_data.pop('_id')
-    return movie_data
+    return movie_data, 200
 
 
 @app.post('/api/v1/user/movies')
