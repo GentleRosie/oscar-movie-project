@@ -1,5 +1,11 @@
 from json import JSONEncoder
 from bson.objectid import ObjectId
+from enum import Enum
+
+
+class Options(Enum):
+    OMDB = 0
+    JSON = 1
 
 
 class CustomJsonEncoder(JSONEncoder):
@@ -36,6 +42,32 @@ def dictionary_builder(keys: list, values: list) -> dict:
     return temp
 
 
+def get_movies_in_database_and_years(movie_database: list) -> dict:
+    movie_list = []
+    year_list = []
+
+    for movie_data in movie_database:
+        movie_data.pop('_id')
+        movie_list.append(movie_data)
+        year_list.append(int(movie_data['year']))
+
+    return dictionary_builder(['movies', 'years'], [movie_list, year_list])
+
+
+def get_omdb_movie_data(movie_dict: dict, option: Enum) -> dict:
+    keys = ['director', 'genre', 'language', 'title', 'year']
+    values = None
+
+    if option is Options.OMDB:
+        values = [movie_dict['Director'], movie_dict['Genre'],
+                  movie_dict['Language'], movie_dict['Title'], movie_dict['Year']]
+    else:
+        values = [movie_dict['director'], movie_dict['genre'],
+                  movie_dict['language'], movie_dict['title'], movie_dict['year']]
+
+    return dictionary_builder(keys, values)
+
+
 def get_winners_and_nominees_of_year_dict(academy_awards_data: list, year: int) -> dict:
     winners_list = []
     nominees_list = []
@@ -58,25 +90,21 @@ def get_category_of_winners_by_year(academy_awards_data: list, year: int, catego
     return dictionary_builder(['category', 'winners'], [f'{category}', winners_category])
 
 
-def get_genre_by_year(academy_awards_data: list, year: int):
+def get_genre_by_year(academy_awards_data: list, year: int, bound: int):
     genre_list = ['Action', 'Adult', 'Adventure', 'Animation', 'Biography', 'Comedy', 'Crime', 'Documentary', 'Drama',
                   'Family', 'Fantasy', 'Film-Noir', 'History', 'Horror', 'Music', 'Musical', 'Mystery', 'N/A', 'News',
                   'Reality-TV', 'Romance', 'Sci-Fi', 'Short', 'Sport', 'Talk-Show', 'Thriller', 'War', 'Western']
-    genre_data = []
-
-    for genre in genre_list:
-        genre_data.append([])
+    genre_data = [[] for _ in range(len(genre_list))]
 
     genre_dict = dictionary_builder(genre_list, genre_data)
 
-    for data in academy_awards_data[str(year)]:
-        if data['film'] is None or len(data['omdb']) == 2:
-            genre_dict['N/A'].append(data)
-        else:
-            genre_list = data['omdb']['Genre'].split(', ')
-            for genre in genre_list:
-                genre_dict[genre].append(data)
-
-    genre_dict['year'] = year
+    for modified_year in range(-bound, bound + 1):
+        for data in academy_awards_data[str(year + modified_year)]:
+            if data['film'] is None or len(data['omdb']) == 2:
+                genre_dict['N/A'].append(data)
+            else:
+                genre_list = data['omdb']['Genre'].split(', ')
+                for genre in genre_list:
+                    genre_dict[genre].append(data)
 
     return genre_dict
