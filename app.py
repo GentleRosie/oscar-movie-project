@@ -59,8 +59,8 @@ def get_oscar_best_actor_winners_by_year(year: int):
     return response, 200
 
 
-@app.get('/api/v1/oscars/categories/<int:year>')
-def get_movie_categories_by_year(year: int):
+@app.get('/api/v1/oscars/genres/<int:year>')
+def get_movie_genres_by_year(year: int):
     if year < 1927 or year > 2019:
         return utility.dictionary_builder(['error'], [f'No data found for year {year}']), 404
 
