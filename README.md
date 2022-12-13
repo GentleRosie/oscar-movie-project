@@ -22,3 +22,4 @@
 - Flask: pip install Flask
 - Flask-PyMongo: pip install Flask-PyMongo
 - PyMongo: pip install pymongo
+- Unidecode: pip install Unidecode
