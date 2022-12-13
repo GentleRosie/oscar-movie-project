@@ -4,6 +4,7 @@ from bson.objectid import ObjectId
 import app
 from pre_initializer import movie_api
 
+
 class CustomJsonEncoder(JSONEncoder):
     def default(self, o):
         if isinstance(o, ObjectId):
@@ -42,9 +43,8 @@ def get_winners_and_nominees_of_year_dict(academy_awards_data: list, year: int) 
     winners_list = []
     nominees_list = []
 
-    for award in academy_awards_data:
-        if award['year'] == year:
-            winners_list.append(award) if award['winner'] else nominees_list.append(award)
+    for award in academy_awards_data[str(year)]:
+        winners_list.append(award) if award['winner'] else nominees_list.append(award)
 
     return dictionary_builder(['nominees', 'winners'], [nominees_list, winners_list])
 
@@ -58,18 +58,31 @@ def get_category_of_winners_by_year(academy_awards_data: list, year: int, catego
         if winner['category'] in categories:
             winners_category.append(winner)
 
-    return dictionary_builder(['category', 'omdb', 'winners'], [f'{category}', None, winners_category])
+    return dictionary_builder(['category', 'winners'], [f'{category}', winners_category])
 
 
-def get_omdb_list_of_movies_by_title_and_year(movie_data: list) -> list:
-    omdb_list = []
+def get_genre_by_year(academy_awards_data: list, year: int):
+    genre_list = ['Action', 'Adult', 'Adventure', 'Animation', 'Biography', 'Comedy', 'Crime', 'Documentary', 'Drama',
+                  'Family', 'Fantasy', 'Film-Noir', 'History', 'Horror', 'Music', 'Musical', 'Mystery', 'N/A', 'News',
+                  'Reality-TV', 'Romance', 'Sci-Fi', 'Short', 'Sport', 'Talk-Show', 'Thriller', 'War', 'Western']
+    genre_data = []
 
-    for index in range(len(movie_data)):
-        movie_title = movie_data[index]['film']
-        movie_year = str(movie_data[index]['year'])
-        omdb_list.append(movie_api.search_movie_title_and_year(movie_title, movie_year))
+    for genre in genre_list:
+        genre_data.append([])
 
-    return omdb_list
+    genre_dict = dictionary_builder(genre_list, genre_data)
+
+    for data in academy_awards_data[str(year)]:
+        if data['film'] is None or len(data['omdb']) == 2:
+            genre_dict['N/A'].append(data)
+        else:
+            genre_list = data['omdb']['Genre'].split(', ')
+            for genre in genre_list:
+                genre_dict[genre].append(data)
+
+    genre_dict['year'] = year
+
+    return genre_dict
 
 
 # for best_actor / best_picture results, function receives response['omdb'].  Loop through response['omdb'] to find if

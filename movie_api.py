@@ -1,6 +1,7 @@
 from urllib.request import urlopen
 from rest_api import RestAPI
 from json import loads
+from unidecode import unidecode
 
 
 class MovieAPI(RestAPI):
@@ -10,11 +11,13 @@ class MovieAPI(RestAPI):
         self.api_request = None
 
     def search_movie_title(self, title: str):
-        title = title.replace(' ', '+')
-        self.api_request = f'{self.api_url}t={title}'
+        decoded_title = unidecode(title)
+        decoded_title = decoded_title.replace(' ', '+')
+        self.api_request = f'{self.api_url}t={decoded_title}'
         return loads(urlopen(self.api_request).read())
 
     def search_movie_title_and_year(self, title: str, year: int):
-        title = title.replace(' ', '+')
-        self.api_request = f'{self.api_url}t={title}&y={year}'
+        decoded_title = unidecode(title)
+        decoded_title = decoded_title.replace(' ', '+')
+        self.api_request = f'{self.api_url}t={decoded_title}&y={year}'
         return loads(urlopen(self.api_request).read())
