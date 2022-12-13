@@ -108,3 +108,7 @@ def get_genre_by_year(academy_awards_data: list, year: int, bound: int):
                     genre_dict[genre].append(data)
 
     return genre_dict
+
+def sort_dictionary(unsorted_dict: dict, reverse: bool, list_len: int) -> list:
+    sorted_keys = sorted(unsorted_dict, key=unsorted_dict.get, reverse=reverse)  # Highest to Lowest
+    return sorted_keys[:list_len]
