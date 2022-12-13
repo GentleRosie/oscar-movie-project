@@ -1,8 +1,7 @@
 from flask import request
 from pre_initializer import movie_api, academy_awards_data
 from initializer import app, mongo
-from utility import dictionary_builder, get_winners_and_nominees_of_year_dict, \
-    get_category_of_winners_by_year, get_omdb_list_of_movies_by_title_and_year
+import utility
 
 
 @app.get('/api/v1/omdb/movies')
@@ -11,11 +10,11 @@ def get_omdb_movie_data():
     movie_data = movie_api.search_movie_title(movie_title)
 
     if len(movie_data) == 2:
-        return dictionary_builder(['error'], [f'No data found for movie {movie_title}']), 404
+        return utility.dictionary_builder(['error'], [f'No data found for movie {movie_title}']), 404
 
-    response = dictionary_builder(['director', 'language', 'title', 'year'],
-                                  [movie_data['Director'], movie_data['Language'],
-                                   movie_data['Title'], movie_data['Year']])
+    response = utility.dictionary_builder(['director', 'language', 'title', 'year'],
+                                          [movie_data['Director'], movie_data['Language'],
+                                           movie_data['Title'], movie_data['Year']])
     mongo.db.omdb.insert_one(response)
     response.pop('_id')
     return response, 200
@@ -38,10 +37,10 @@ def get_oscar_best_picture_winners_by_year(year: int):
     if year < 1927 or year > 2019:
         return dictionary_builder(['error'], [f'No data found for year {year}']), 404
 
-    response = get_category_of_winners_by_year(academy_awards_data, year, 'Best Picture',
-                                               ['OUTSTANDING PICTURE', 'OUTSTANDING PRODUCTION',
-                                                'OUTSTANDING MOTION PICTURE', 'BEST MOTION PICTURE', 'BEST PICTURE'])
-    response['omdb'] = response['omdb'] = get_omdb_list_of_movies_by_title_and_year(response['winners'])
+    response = utility.get_category_of_winners_by_year(academy_awards_data, year, 'Best Picture',
+                                                       ['OUTSTANDING PICTURE', 'OUTSTANDING PRODUCTION',
+                                                        'OUTSTANDING MOTION PICTURE', 'BEST MOTION PICTURE',
+                                                        'BEST PICTURE'])
     mongo.db.oscars.insert_one(response)
     response.pop('_id')
     return response, 200
@@ -52,26 +51,17 @@ def get_oscar_best_actor_winners_by_year(year: int):
     if year < 1927 or year > 2019:
         return dictionary_builder(['error'], [f'No data found for year {year}']), 404
 
-    response = get_category_of_winners_by_year(academy_awards_data, year, 'Best Actors',
-                                               ['ACTOR', 'ACTOR IN A LEADING ROLE',
-                                                'ACTRESS IN A LEADING ROLE', 'ACTRESS'])
-    response['omdb'] = get_omdb_list_of_movies_by_title_and_year(response['winners'])
+    response = utility.get_category_of_winners_by_year(academy_awards_data, year, 'Best Actors',
+                                                       ['ACTOR', 'ACTOR IN A LEADING ROLE',
+                                                        'ACTRESS IN A LEADING ROLE', 'ACTRESS'])
     mongo.db.oscars.insert_one(response)
     response.pop('_id')
     return response, 200
 
 
-# @app.get('/api/v1/oscars/recommendation') WORKING ON IMPLEMENTATION
-# def get_movie_recommendation():
-#     year_frequency = [0] * 10
-#     index = None
-#     test_data = [1969, 2019, 1981, 1974, 2016, 1989, 1946]
-#     for year in test_data:
-#         if test_data < 2000:
-#             index = floor((year % 100) / 10) * 10
-#         else:
-#             index = 9 + floor((year % 100) / 10) * 10
-#     # query database based on highest years searched then return movie
+@app.get('/api/v1/oscars/recommendation')
+def get_movie_recommendation():
+    return ':)'
 
 
 @app.get('/api/v1/user/movies')
