@@ -59,6 +59,17 @@ def get_oscar_best_actor_winners_by_year(year: int):
     return response, 200
 
 
+@app.get('/api/v1/oscars/categories/<int:year>')
+def get_movies_categories_by_year(year: int):
+    if year < 1927 or year > 2019:
+        return utility.dictionary_builder(['error'], [f'No data found for year {year}']), 404
+
+    response = utility.get_genre_by_year(academy_awards_data, year)
+    mongo.db.oscars.insert_one(response)
+    response.pop('_id')
+    return response, 200
+
+
 @app.get('/api/v1/oscars/recommendation')
 def get_movie_recommendation():
     return ':)'
