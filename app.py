@@ -138,7 +138,7 @@ def get_all_movies():
     for movie_data in mongo.db.user.find():
         movie_data.pop('_id')
         response.append(movie_data)
-    return utility.dictionary_builder(['movies'], [response]), 200
+    return response, 200
 
 
 @app.get('/api/v1/user/movies/<string:movie_title>')
