@@ -2,9 +2,9 @@ from flask import request
 from pre_initializer import movie_api, academy_awards_data
 from initializer import app, mongo
 from flask import render_template
-
+import utility
 from utility import dictionary_builder, get_winners_and_nominees_of_year_dict, \
-    get_category_of_winners_by_year, get_omdb_list_of_movies_by_title_and_year, rated_recommendation_list, \
+    get_category_of_winners_by_year, rated_recommendation_list, \
     ratings_recommendation_list, genre_recommendation_list
 
 genre_list = []
@@ -63,7 +63,9 @@ def index():
         movie_list.append(movies)
 
     return render_template('table.html', list=movie_list)
-import utility
+
+
+# import utility
 
 
 # incorporate into recommendation functions
