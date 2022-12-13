@@ -18,40 +18,6 @@ rated_list = []
 #     return render_template('index.html', list=movie_list)
 
 
-# @app.get("/api/v2/movies")
-# def get_all_movies():
-#     result = []
-#     for movie in db.find():
-#         result.append({'title' : movie['title'], 'year' : movie['year'], 'director' : movie['director']})
-#     return jsonify({'result' : result})
-# method was used in conjunction with React JS
-# @app.route('/add', methods = ['POST'])
-# def add_user():
-#     _json = request.json
-#     _name = _json['name']
-#     _email = _json['email']
-#     _password = _json['password']
-#
-#     if _name and _email and _password and request.method == 'POST':
-#         mongo.db.movies.insert_one({'name': _name, 'email': _email, 'password': _password})
-#         response = jsonify('User added successfully!')
-#         response.status_code = 200
-#         return response
-#     else:
-#         return not_found()
-# @app.errorhandler(404)
-# def not_found(error=None):
-#     message = {
-#         'status': 404,
-#         'message': 'Not Found' + request.url
-#     }
-#     response = jsonify(message)
-#
-#
-# @app.route('/names', methods = ['GET'])
-# def default():
-#     return {"names": ["Alan", "Edgar", "Poe"]}
-FLASK_DEBUG = 1
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -70,7 +36,7 @@ def index():
 
 # incorporate into recommendation functions
 @app.get('/api/v1/omdb/movies')
-def get_omdb_movie_data():
+def get_omdb_movie():
     movie_title = request.args['title']
     movie_data = movie_api.search_movie_title(movie_title)
 
@@ -84,9 +50,7 @@ def get_omdb_movie_data():
     response = dictionary_builder(['director', 'language', 'title', 'year'],
                                   [movie_data['Director'], movie_data['Language'],
                                    movie_data['Title'], movie_data['Year']])
-    response = utility.dictionary_builder(['director', 'language', 'title', 'year'],
-                                          [movie_data['Director'], movie_data['Language'],
-                                           movie_data['Title'], movie_data['Year']])
+    response = utility.get_omdb_movie_data(movie_data, utility.Options.OMDB)
     mongo.db.omdb.insert_one(response)
     response.pop('_id')
     return response, 200
@@ -98,7 +62,7 @@ def get_oscar_nominees_by_year(year: int):
         return utility.dictionary_builder(['error'], [f'No data found for year {year}']), 404
 
     response = utility.get_winners_and_nominees_of_year_dict(academy_awards_data, year)
-    response['year'] = year
+    response['year'] = str(year)
     mongo.db.oscars.insert_one(response)
     response.pop('_id')
     return response, 200
@@ -114,6 +78,7 @@ def get_oscar_best_picture_winners_by_year(year: int):
                                                        ['OUTSTANDING PICTURE', 'OUTSTANDING PRODUCTION',
                                                         'OUTSTANDING MOTION PICTURE', 'BEST MOTION PICTURE',
                                                         'BEST PICTURE'])
+    response['year'] = str(year)
     mongo.db.oscars.insert_one(response)
     response.pop('_id')
     return response, 200
@@ -128,17 +93,19 @@ def get_oscar_best_actor_winners_by_year(year: int):
     response = utility.get_category_of_winners_by_year(academy_awards_data, year, 'Best Actors',
                                                        ['ACTOR', 'ACTOR IN A LEADING ROLE',
                                                         'ACTRESS IN A LEADING ROLE', 'ACTRESS'])
+    response['year'] = str(year)
     mongo.db.oscars.insert_one(response)
     response.pop('_id')
     return response, 200
 
 
 @app.get('/api/v1/oscars/categories/<int:year>')
-def get_movies_categories_by_year(year: int):
+def get_movie_categories_by_year(year: int):
     if year < 1927 or year > 2019:
         return utility.dictionary_builder(['error'], [f'No data found for year {year}']), 404
 
-    response = utility.get_genre_by_year(academy_awards_data, year)
+    response = utility.get_genre_by_year(academy_awards_data, year, 0)
+    response['year'] = str(year)
     mongo.db.oscars.insert_one(response)
     response.pop('_id')
     return response, 200
@@ -146,7 +113,63 @@ def get_movies_categories_by_year(year: int):
 
 @app.get('/api/v1/oscars/recommendation')
 def get_movie_recommendation():
-    return ':)'
+    user_omdb_dict = utility.get_movies_in_database_and_years(mongo.db.user_omdb.find())
+    movies_list = user_omdb_dict['movies']
+    years_list = user_omdb_dict['years']
+
+    if len(movies_list) < 2:
+        error_string = f'Create at least 3 movies; got {len(movies_list)} instead'
+        return utility.dictionary_builder(['error'], [error_string]), 404
+
+    omdb_dict = utility.get_movies_in_database_and_years(mongo.db.omdb.find())
+
+    if len(omdb_dict['movies']) < 2:
+        error_string = f'Look up at least 3 movies; got {len(movies_list)} instead'
+        return utility.dictionary_builder(['error'], [error_string]), 404
+
+    movies_list += omdb_dict['movies']
+    years_list += omdb_dict['years']
+
+    len_oscar = len(years_list)
+    for oscar in mongo.db.oscars.find():
+        years_list.append(int(oscar['year']))
+    len_oscar = len(years_list) - len_oscar
+
+    if len_oscar < 2:
+        error_string = f'Look up at least 3 Oscars ceremonies; got {len_oscar} instead'
+        return utility.dictionary_builder(['error'], [error_string]), 404
+
+    average_year = int(round(sum(years_list) / len(years_list), 0))
+
+    genre_list = ['Action', 'Adult', 'Adventure', 'Animation', 'Biography', 'Comedy', 'Crime', 'Documentary', 'Drama',
+                  'Family', 'Fantasy', 'Film-Noir', 'History', 'Horror', 'Music', 'Musical', 'Mystery', 'N/A', 'News',
+                  'Reality-TV', 'Romance', 'Sci-Fi', 'Short', 'Sport', 'Talk-Show', 'Thriller', 'War', 'Western']
+    genre_data = [0] * len(genre_list)
+    genre_dict = utility.dictionary_builder(genre_list, genre_data)
+
+    for movie in movies_list:
+        genre_list = movie['genre'].split(', ')
+        for genre in genre_list:
+            genre_dict[genre] += 1
+
+    sorted_genre_list = utility.sort_dictionary(genre_dict, True, 3)
+    genre_dict = utility.get_genre_by_year(academy_awards_data, average_year, 2)
+
+    response = []
+    duplicate_movies = []
+
+    for genre in sorted_genre_list:
+        temp = []
+        i = 0
+        while len(temp) <= 1:
+            movie = genre_dict[genre][i]
+            if movie['film'] and len(movie['omdb']) > 2 and float(movie['omdb']['imdbRating']) >= 7.2 and movie['film'] not in duplicate_movies:
+                temp.append(movie)
+                duplicate_movies.append(movie['film'])
+            i += 1
+        response += temp
+
+    return response, 200
 
 
 @app.get('/api/v1/user/movies')
@@ -175,13 +198,17 @@ def add_one_movie():
     if not request.is_json:
         return {'error': 'Request must be JSON'}, 415
 
-    if not ('director' in request.json and 'language' in request.json and
-            'title' in request.json and 'year' in request.json):
+    if not ('director' in request.json and 'genre' in request.json and
+            'language' in request.json and 'title' in request.json and 'year' in request.json):
         return {'error': 'Malformed request. Missing required movie fields'}, 400
 
-    response = utility.dictionary_builder(['director', 'language', 'title', 'year'],
-                                          [request.json.get('director'), request.json.get('language'),
-                                           request.json.get('title'), request.json.get('year')])
+    movie_data = movie_api.search_movie_title(request.json['title'])
+
+    if len(movie_data) > 2:
+        movie_response = utility.get_omdb_movie_data(movie_data, utility.Options.OMDB)
+        mongo.db.user_omdb.insert_one(movie_response)
+
+    response = utility.get_omdb_movie_data(request.json, utility.Options.JSON)
     mongo.db.user.insert_one(response)
     response.pop('_id')
     return response, 201
@@ -198,15 +225,16 @@ def edit_one_movie(movie_title: str):
     if not request.is_json:
         return {'error': 'Request must be JSON'}, 415
 
-    if not ('director' in request.json or 'language' in request.json or
-            'title' in request.json or 'year' in request.json):
+    if not ('director' in request.json or 'genre' in request.json or
+            'language' in request.json or 'title' in request.json or 'year' in request.json):
         return {'error': 'Malformed request. Missing required movie fields'}, 400
 
-    response = utility.dictionary_builder(['director', 'language', 'title', 'year'],
-                                          [request.json.get('director') or movie_data['director'],
-                                           request.json.get('language') or movie_data['language'],
-                                           request.json.get('title') or movie_data['title'],
-                                           request.json.get('year') or movie_data['year']])
+    response = utility.dictionary_builder(['director', 'genre', 'language', 'title', 'year'],
+                                          [request.json['director'] or movie_data['director'],
+                                           request.json['language'] or movie_data['language'],
+                                           request.json['genre'] or movie_data['genre'],
+                                           request.json['title'] or movie_data['title'],
+                                           request.json['year'] or movie_data['year']])
     mongo.db.user.update_one(movie_format, {'$set': response})
     return response, 200
 
