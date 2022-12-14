@@ -40,7 +40,7 @@ Our customer is Gary Kane, our professor for CSC 131, he requested a movie datab
 - MongoDB: Make sure terminal commands are inserted (mongod and mongosh) and connect with compass
 - Pip: Reconfigure PyCharm or reinstall PyCharm 
 #### End-User Impact
--	Do not copy and paste code onto files without installing needed packages and modules, cloning repository will have least number of errors.
+-	Do not copy and paste code onto files without installing needed packages and modules, cloning the repository will have the least number of errors.
 
 #### Installation (WILL ADD MORE DETAIL TO INSTALLATION TMRW -BRANDEN)
 ##### 1. Install Python and a Python IDE (PyCharm recommended) to run the python files
