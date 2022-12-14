@@ -43,7 +43,7 @@ Our customer is Gary Kane, our professor for CSC 131, he requested a movie datab
 -	Do not copy and paste code onto files without installing needed packages and modules, cloning repository will have least number of errors.
 
 #### Installation (WILL ADD MORE DETAIL TO INSTALLATION TMRW -BRANDEN)
-###### 1. Install Python and a Python IDE (PyCharm recommended) to run the python files
+##### 1. Install Python and a Python IDE (PyCharm recommended) to run the python files
 To ensure that the program runs properly, one must adjust their Python settings.
 Python Packages (must be installed):
 - Pymongo
@@ -56,7 +56,7 @@ The configuration must be edited:
 - The “Target” path must path to the location of app.py
 Install necessary modules:
 
-###### 2. Install MongoDB Community Server and MongoDB Shell to run the database
+##### 2. Install MongoDB Community Server and MongoDB Shell to run the database
 - Download the MongoDB Community Server and MongoDB Shell
 - ENSURE that MongoDBCompass is installed when using the installer. MongoDBCompass is used to view the different databases
 - In your 'main' drive (C: drive, D: drive, etc.) make a folder called 'data' and within that folder make another folder called 'db'
@@ -65,8 +65,8 @@ Install necessary modules:
     - To properly edit the environment variables, search “Environmental Variables” on the system. Under the “System variables” tab, click on the ‘PATH’ variable and edit it. Add new paths to the MongoDB ‘bin’ folder and the Mongosh ‘bin’ folder
 - Open two command prompts and type the following: mongod for one prompt, mongosh for the other
 - Open MongoDBCompass and connect to the local host URI once everything is installed successfully; as the user uses the queries or CRUD functionalities, the database should update after refreshing
-###### 3. Install an API client (Insomnia recommended) to ensure that the REST API endpoints are working properly
-###### 4.Install NodeJS
+##### 3. Install an API client (Insomnia recommended) to ensure that the REST API endpoints are working properly
+##### 4.Install NodeJS
 
 ### REST API Endpoints 
 ____
