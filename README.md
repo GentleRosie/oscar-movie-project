@@ -291,10 +291,10 @@ Code: 404 NOT FOUND <br />
 ],
 "year": "2000"
 }
-Error Response: 
-Code: 404
-Content:
-{
+**Error Response:**
+**Code:** 404 <br />
+**Content:**
+`{
 "error": "No data found for year 2024"
 }`
 ##### Sample Call: 
