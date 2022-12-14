@@ -68,6 +68,8 @@ Install necessary modules:
 ##### 3. Install an API client (Insomnia recommended) to ensure that the REST API endpoints are working properly
 ##### 4.Install NodeJS
 
+### NOTE: SOME OF THE REST API ENDPOINTS CONTAIN CONTENT WHILE SOME DO NOT. THE PURPOSE IS TO DEMONSTRATE HOW SOME ENDPOINTS LOOK WITH CONTENT, AND HOW SOME ENDPOINTS LOOK IN GENERAL.
+
 ### REST API Endpoints 
 ____
 #### **ROOT: http://127.0.0.1:5000**
