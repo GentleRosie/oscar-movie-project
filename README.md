@@ -7,7 +7,7 @@ Date of Release/Distribution: December 14, 2022
 
 
 # The Oscar Movie Project - 131
-_
+
 ### Release Notes
 After weeks of work and progress, the Movie Oscar Project presented by the Krabby Daddies is finally available! Version 1.0 will be available for release on December 14, 2022. 
 
