@@ -8,13 +8,13 @@
 ### Release Notes
 After weeks of work and progress, The Movie Oscar Project presented by the Krabby Daddies is finally available! Version 1.0 will be available for release on December 14, 2022. 
 
-##### Overview
+#### Overview
 Movie software application that takes movies across databases and allows queries to be made to find certain movies based off certain criteria. The queries are stored in a local database, and movies in the local database may be retrieved, added, edited, deleted.
-##### Purpose
+#### Purpose
 The purpose of the product is to make the idea of querying movies easier by collecting data across multiple movie databases and putting them all into one application.
-## Customer/Client
+#### Customer/Client
 Our customer is Gary Kane, our professor for CSC 131, he requested a movie database as a good project to practice the concepts learned in our Software Engineering course.
-##### Feature Summary
+#### Feature Summary
 -	Full CRUD operations supported!
     - Create: Ability to add new movies
     - Read: Ability to query a specific movie
@@ -30,19 +30,19 @@ Our customer is Gary Kane, our professor for CSC 131, he requested a movie datab
 -	Front end operational
     - Query by OMBD, displays movie poster and info upon searched movie title
 
-##### Issue Summary
+#### Issue Summary
 - Issue with cloning repo 
 - Issue with MongoDB
 - Issue with pip
-##### Steps to Reproduce
+#### Steps to Reproduce
 - Repo: Clone repo onto another program or 
 - Repo: Delete existing program and create new one with flask settings
 - MongoDB: Make sure terminal commands are inserted (mongod and mongosh) and connect with compass
 - Pip: Reconfigure PyCharm or reinstall PyCharm 
-##### End-User Impact
+#### End-User Impact
 -	Do not copy and paste code onto files without installing needed packages and modules, cloning repository will have least number of errors.
 
-##### Installation (WILL ADD MORE DETAIL TO INSTALLATION TMRW -BRANDEN)
+#### Installation (WILL ADD MORE DETAIL TO INSTALLATION TMRW -BRANDEN)
 ###### 1. Install Python and a Python IDE (PyCharm recommended) to run the python files
 To ensure that the program runs properly, one must adjust their Python settings.
 Python Packages (must be installed):
