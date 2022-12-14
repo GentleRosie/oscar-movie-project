@@ -15,7 +15,7 @@ After weeks of work and progress, The Movie Oscar Project presented by the Krabb
 Movie software application that takes movies across databases and allows queries to be made to find certain movies based off certain criteria. The queries are stored in a local database, and movies in the local database may be retrieved, added, edited, deleted.
 ##### Purpose
 The purpose of the product is to make the idea of querying movies easier by collecting data across multiple movie databases and putting them all into one application.
-Feature Summary
+##### Feature Summary
 -	Full CRUD operations supported!
     - Create: Ability to add new movies
     - Read: Ability to query a specific movie
