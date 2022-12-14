@@ -386,7 +386,7 @@ Code: 404 NOT FOUND <br />
 ``curl --request GET \
   --url http://127.0.0.1:5000/api/v1/oscars/recommendation``
   
-**Notes:** This method returns a list of movie recommendations. The method gets an average year and the top three genres searched up. Then, it returns two movies that are higher than the average ratings for the top two genres and one for the third highest  genre.
+**Notes:** This method returns a list of movie recommendations. The method gets an average year and the top three genres searched. Then, it returns two movies that are higher than the average ratings for the top two genres and one for the third highest genre.
 
 ##### get_all_movies
 **URL:** /user/movies
@@ -412,7 +412,7 @@ Code: 404 NOT FOUND <br />
 `curl --request GET \ 
   --url http://127.0.0.1:5000/api/v1/user/movies `
 
-**Notes:** This CRUD method returns all movies that is stored in the user database.
+**Notes:** This CRUD method returns all movies that are stored in the user database.
 
 ##### get_one_movie
 **URL:** /api/v1/user/movies/<string:movie_title>
@@ -434,7 +434,7 @@ Code: 404 NOT FOUND <br />
 ##### Sample Call: 
 `curl --request GET \
   --url http://127.0.0.1:5000/api/v1/user/movies/`
-**Notes:** This CRUD method return one single and specific movie from the User database.
+**Notes:** This CRUD method returns one single and specific movie from the User database.
 
 ##### add_one_movie
 **URL:** /api/v1/user/movies
