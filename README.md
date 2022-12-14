@@ -484,12 +484,18 @@ Code: 404 NOT FOUND <br />
 ### Disclaimers
 This product was made by college students and not professional software engineers. The product may contain bugs or errors that college students are prone to make.
 
-#### Contact
+### Contact
  Please contact the Krabby Daddies via Sac State email for any inquiries.
 > Jacob Correa (Scrum Master) jccorrea@csus.edu
+> 
 > Danny Zhou (Development Team) dannyzhou@csus.edu
+> 
 > Mohammed Al Chalabi (Development Team) mohammedalchalabi@csus.edu 
+> 
 > Kiranjot Kaur (Development Team) kiranjotkaur@csus.edu
+> 
 > Jose Martinez (Development Team) jjmartinez@csus.edu
+> 
 > Branden Nguyen (Development Team) brandenmnguyen@csus.edu
+> 
 > Brandon Kmiec (Development Team) bkmiec@csus.edu
