@@ -1,9 +1,8 @@
-#### Oscar Movie Project Release Notes
-##### Krabby Daddies
-Mohammed Chalabi, Jacob Correa, Kiranjot Kaur, Brandon Kmiec, Jose Martinez, Branden Nguyen, Danny Zhou
-
-Oscar Movie Project
-Date of Release/Distribution: December 14, 2022
+#### Oscar Movie Project 
+- Release Notes
+- Mohammed Chalabi, Jacob Correa, Kiranjot Kaur, Brandon Kmiec, Jose Martinez, Branden Nguyen, Danny Zhou
+- Oscar Movie Project - 131
+- Date of Release/Distribution: December 14, 2022
 
 
 # The Oscar Movie Project - 131
@@ -69,7 +68,7 @@ Install necessary modules:
 ###### 3. Install an API client (Insomnia recommended) to ensure that the REST API endpoints are working properly
 ###### 4.Install NodeJS
 
-#### REST API Endpoints 
+### REST API Endpoints 
 ____
 #### **ROOT: http://127.0.0.1:5000**
 #
