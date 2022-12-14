@@ -1,7 +1,7 @@
 #### Oscar Movie Project Release Notes
 ##### Krabby Daddies
 Mohammed Chalabi, Jacob Correa, Kiranjot Kaur, Brandon Kmiec, Jose Martinez, Branden Nguyen, Danny Zhou
-#
+
 Oscar Movie Project
 Date of Release/Distribution: December 14, 2022
 
@@ -75,13 +75,13 @@ Install necessary modules:
 
 #### REST API Endpoints 
 ____
-##### **ROOT: http://127.0.0.1:5000**
+#### **ROOT: http://127.0.0.1:5000**
 #
-##### get_omdb_movie
+#### get_omdb_movie
 **URL:** /api/v1/omdb/movies?title=
 **Method:** `GET`
 **URL Params:** `title = [string]`
-###### Success Response: 
+##### Success Response: 
 **Code:** 200 <br />
 **Content:**
 `{
@@ -91,19 +91,19 @@ ____
 "title": "Frozen",
 "year": "2013"
 }`
-###### Error Response: 
+##### Error Response: 
 Code: 404 NOT FOUND <br />
 **Content:** 
 `{
 "error": "No data found for movie frozenfrozenfrozen"
 }`
 
-###### Sample Call: 
+##### Sample Call: 
 `curl --request GET \
   --url 'http://127.0.0.1:5000/api/v1/omdb/movies?title=Frozen'`
 **Notes:** This query queries the OMDB API and returns the director, genre, language, title, and year of the movie.
 
-##### get_oscar_nominees_by_year
+#### get_oscar_nominees_by_year
 **URL:** /api/v1/oscars/<int:year>
 **Method:** `GET`
 **URL Params:** `year = [integer]`
@@ -115,18 +115,18 @@ Code: 404 NOT FOUND <br />
 "winners": [ 25 ],
 "year": "1972"
 }`
-###### Error Response: 
+##### Error Response: 
 **Code:** 404 RESPONSE NOT FOUND <br />
 **Content:**
 `{"error": "No data found for year 2022"}`
-###### Sample Call: 
+##### Sample Call: 
 **Notes:** This query parses the Oscars data and returns the nominees and winners of the entered year in two lists (both lists can be expanded to give information about the movies)
 
 ##### get_oscar_best_picture_winners_by_year
 **URL:** /api/v1/oscars/best_picture/<int:year>
 **Method:** GET
 **URL Params:** year = [integer]
-###### Success Response:
+##### Success Response:
 **Code:** 200
 **Content:**
 `{
@@ -180,13 +180,13 @@ Code: 404 NOT FOUND <br />
 ],
 "year": "1972"
 }`
-###### Error Response: 
+##### Error Response: 
 **Code:** 404 NOT FOUND <br />
 **Content:**
 `{
 "error": "No data found for year 2023"
 }`
-###### Sample Call: 
+##### Sample Call: 
 **Notes:** This query parses the Oscars data and returns full information on the best picture winner for the year entered.
 ##### get_oscar_best_actor_winners_by_year
 **URL:** /api/v1/oscars/best_actor/<int:year>
@@ -297,14 +297,14 @@ Content:
 {
 "error": "No data found for year 2024"
 }`
-###### Sample Call: 
+##### Sample Call: 
 **Notes:** This query parses the Oscars data and returns full information on the best actor winner(s) for the year entered.
 
 ##### get_movie_genres_by_year
 **URL:** /api/v1/oscars/genres/<int:year>
 **Method:** `GET`
 **URL Params:** `year = [integer]`
-###### Success Response: 
+##### Success Response: 
 **Code:** 200 <br />
 **Content:**
 `{
@@ -338,24 +338,24 @@ Content:
 "Western": [],
 "year": "2005"
 }`
-###### Error Response: 
+##### Error Response: 
 **Code:** 404 NOT FOUND <br />
 **Content:**
 `{
 "error": "No data found for year 1920"
 }`
-###### Sample Call: 
+##### Sample Call: 
 **Notes:** This query parses the Oscars data and returns full information on the movies sorted in specific genre lists and an average rating for the year entered.
 
-##### get_movie_recommendation
+#### get_movie_recommendation
 **URL:** /api/v1/oscars/recommendation
 **Method:** `GET`
 **URL Params:** `N/A`
-###### Success Response: 
+##### Success Response: 
 **Code:** 200 <br />
 **Content:**
 `Too much information to paste on the document. It will recommend five movies and it will display full information for all five of the movies`
-###### Error Response: 
+##### Error Response: 
 **Code:** 404 NOT FOUND <br />
 **Content:**
 `{
@@ -367,7 +367,7 @@ Content:
 `{
 "error": "Look up at least 3 Oscars ceremonies; got 0 instead"
 }`
-###### Sample Call: 
+##### Sample Call: 
 ``curl --request GET \
   --url http://127.0.0.1:5000/api/v1/oscars/recommendation``
 **Notes:** This method returns a list of movie recommendations. The method gets an average year and the top three genres searched up. Then, it returns two movies that are higher than the average ratings for the top two genres and one for the third highest  genre.
@@ -376,7 +376,7 @@ Content:
 **URL:** /user/movies
 **Method:** `GET`
 **URL Params:** `N/A`
-###### Success Response: 
+##### Success Response: 
 **Code:** 200 <br />
 **Content:**
 `[
@@ -388,17 +388,17 @@ Content:
 "year": "1997"
 }
 ]`
-###### Error Response: 
+##### Error Response: 
 **Code:** 404 NOT FOUND <br />
 **Content:**
-###### Sample Call: 
+##### Sample Call: 
 **Notes:** This CRUD method returns all movies that is stored in the user database.
 
 ##### get_one_movie
 **URL:** /api/v1/user/movies/<string:movie_title>
 **Method:** `GET`
 **URL Params:** `movie_title = [string]`
-###### Success Response: 
+##### Success Response: 
 **Code:** 200 <br />
 **Content:**
 `{
@@ -408,10 +408,10 @@ Content:
 "title": "Titanic",
 "year": "1997"
 }`
-###### Error Response: 
+##### Error Response: 
 **Code:** 200 <br />
 **Content:** `[] (empty list)`
-###### Sample Call: 
+##### Sample Call: 
 `curl --request GET \
   --url http://127.0.0.1:5000/api/v1/user/movies/`
 **Notes:** This CRUD method return one single and specific movie from the User database.
@@ -420,7 +420,7 @@ Content:
 **URL:** /api/v1/user/movies
 **Method:** `POST`
 **URL Params:** 
-###### Success Response: 
+##### Success Response: 
 **Code:** 200 <br />
 **Content:**
 `{
@@ -430,7 +430,7 @@ Content:
 "title": "Titanic",
 "year": "1997"
 }`
-###### Error Response: 
+##### Error Response: 
 **Code:** 200 <br />
 **Content:** `[] (empty list)`
 **Payload: **
@@ -441,14 +441,14 @@ Content:
 "title": "",
 "year": ""
 }`
-###### Sample Call: 
+##### Sample Call: 
 **Notes:** This CRUD method adds a movie of the user’s choice to the User database.
 
 ##### edit_one_movie
 **URL:** /api/v1/user/movies/<string:movie_title>
 **Method:** `PUT`
 **URL Params:** `movie_title = [string]`
-###### Success Response: 
+##### Success Response: 
 **Code:** 200
 **Content:**
 **Error Response: **
@@ -462,7 +462,7 @@ Content:
 "title": "",
 "year": ""
 }`
-###### Sample Call: 
+##### Sample Call: 
 **Notes:** This CRUD method allows the user to edit fields of a movie in User database by editing the movie details with JSON.
 
 ##### delete_one_movie
