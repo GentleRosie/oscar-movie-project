@@ -98,6 +98,7 @@ Code: 404 NOT FOUND <br />
 ##### Sample Call: 
 `curl --request GET \
   --url 'http://127.0.0.1:5000/api/v1/omdb/movies?title=Frozen'`
+
 **Notes:** This query queries the OMDB API and returns the director, genre, language, title, and year of the movie.
 
 #### get_oscar_nominees_by_year
@@ -116,7 +117,11 @@ Code: 404 NOT FOUND <br />
 **Code:** 404 RESPONSE NOT FOUND <br />
 **Content:**
 `{"error": "No data found for year 2022"}`
+
 ##### Sample Call: 
+`curl --request GET \ 
+  --url http://127.0.0.1:5000/api/v1/oscars/ `
+
 **Notes:** This query parses the Oscars data and returns the nominees and winners of the entered year in two lists (both lists can be expanded to give information about the movies)
 
 ##### get_oscar_best_picture_winners_by_year
@@ -183,8 +188,13 @@ Code: 404 NOT FOUND <br />
 `{
 "error": "No data found for year 2023"
 }`
+
 ##### Sample Call: 
+`curl --request GET \ 
+  --url http://127.0.0.1:5000/api/v1/oscars/best_picture/ `
+
 **Notes:** This query parses the Oscars data and returns full information on the best picture winner for the year entered.
+
 ##### get_oscar_best_actor_winners_by_year
 **URL:** /api/v1/oscars/best_actor/<int:year>
 **Method:** `GET`
@@ -294,7 +304,11 @@ Code: 404 NOT FOUND <br />
 `{
 "error": "No data found for year 2024"
 }`
+
 ##### Sample Call: 
+`curl --request GET \ 
+  --url http://127.0.0.1:5000/api/v1/oscars/best_actor/`
+
 **Notes:** This query parses the Oscars data and returns full information on the best actor winner(s) for the year entered.
 
 ##### get_movie_genres_by_year
@@ -341,7 +355,11 @@ Code: 404 NOT FOUND <br />
 `{
 "error": "No data found for year 1920"
 }`
+
 ##### Sample Call: 
+`curl --request GET \ 
+  --url http://127.0.0.1:5000/api/v1/oscars/genres/ `
+
 **Notes:** This query parses the Oscars data and returns full information on the movies sorted in specific genre lists and an average rating for the year entered.
 
 #### get_movie_recommendation
@@ -367,6 +385,7 @@ Code: 404 NOT FOUND <br />
 ##### Sample Call: 
 ``curl --request GET \
   --url http://127.0.0.1:5000/api/v1/oscars/recommendation``
+  
 **Notes:** This method returns a list of movie recommendations. The method gets an average year and the top three genres searched up. Then, it returns two movies that are higher than the average ratings for the top two genres and one for the third highest  genre.
 
 ##### get_all_movies
@@ -387,8 +406,12 @@ Code: 404 NOT FOUND <br />
 ]`
 ##### Error Response: 
 **Code:** 404 NOT FOUND <br />
-**Content:**
+**Content:** `[]`
+
 ##### Sample Call: 
+`curl --request GET \ 
+  --url http://127.0.0.1:5000/api/v1/user/movies `
+
 **Notes:** This CRUD method returns all movies that is stored in the user database.
 
 ##### get_one_movie
@@ -439,6 +462,25 @@ Code: 404 NOT FOUND <br />
 "year": ""
 }`
 ##### Sample Call: 
+` curl --request POST \ 
+  --url http://127.0.0.1:5000/api/v1/user/movies \ 
+
+  --header 'Content-Type: application/json' \ 
+
+  --data '{ 
+
+"director": "James Cameron", 
+
+"genre": "Drama, Romance", 
+
+"language": "English, Swedish, Italian, French", 
+
+"title": "Titanic", 
+
+"year": "1997" 
+
+}' `
+
 **Notes:** This CRUD method adds a movie of the user’s choice to the User database.
 
 ##### edit_one_movie
@@ -459,7 +501,28 @@ Code: 404 NOT FOUND <br />
 "title": "",
 "year": ""
 }`
+
 ##### Sample Call: 
+`curl --request PUT \ 
+
+  --url http://127.0.0.1:5000/api/v1/user/movies \ 
+
+  --header 'Content-Type: application/json' \ 
+
+  --data '{ 
+
+"director": "James Cameron", 
+
+"genre": "Drama, Romance", 
+
+"language": "English, Swedish, Italian, French", 
+
+"title": "Titanic", 
+
+"year": "1997" 
+
+}' `
+
 **Notes:** This CRUD method allows the user to edit fields of a movie in User database by editing the movie details with JSON.
 
 ##### delete_one_movie
@@ -479,7 +542,11 @@ Code: 404 NOT FOUND <br />
 **Error Response: **
 **Code:** 404 NOT FOUND <br />
 **Content:** `Movie not found`
-##### Sample Call: 
+
+##### Sample Call:
+`curl --request DELETE \ 
+  --url http://127.0.0.1:5000/api/v1/user/movies/Titanic ` 
+
 **Notes:** This CRUD method allows the user to delete a movie from the User database by searching the movie title.
 
 ### Disclaimers
