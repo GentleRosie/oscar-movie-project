@@ -18,7 +18,7 @@ def get_omdb_movie():
     return response, 200
 
 
-@app.get('/api/v1/oscars/<int:year>')
+@app.get('/api/v1/oscars/year/<int:year>')
 def get_oscar_nominees_by_year(year: int):
     if year < 1927 or year > 2019:
         return utility.dictionary_builder(['error'], [f'No data found for year {year}']), 404
