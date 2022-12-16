@@ -102,7 +102,7 @@ Code: 404 NOT FOUND <br />
 **Notes:** This query queries the OMDB API and returns the director, genre, language, title, and year of the movie.
 
 #### get_oscar_nominees_by_year
-**URL:** /api/v1/oscars/<int:year>
+**URL:** /api/v1/oscars/year/<int:year>
 **Method:** `GET`
 **URL Params:** `year = [integer]`
 ###### Success Response: 
